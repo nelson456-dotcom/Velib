@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html lang="en"
+      layout:decorator="default"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Stations</title>
+    <link href="webjars/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+            position: static;
+            height: 100%;
+        }
+        #logout{
+            margin:5px;
+        }
+
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #filters {
+            position: absolute;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 25px;
+            margin: 0;
+            top: 50px;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<div id="filters">
+    <p> <span th:utext="${userName}"> </span> </p>
+    <p> Number of available bicycles <input type="number" id="numbikes" oninput="filter()"> </p>
+    <p> Number of available docks  <input type="number" id="numdocks" oninput="filter()"> </p>
+    <p> <form th:action="@{/logout}"method="get"> <button name="registration" type="Submit">Logout</button> </form> </p>
+</div>
+<script th:inline="javascript">
+    var stations = /*[[${stations}]]*/ null;
+    var map;
+    var markers = [];
+    var userpos;
+    var directionsService;
+    var directionsDisplay;
+
+    function initMap() {
+        directionsService = new google.maps.DirectionsService();
+        directionsDisplay = new google.maps.DirectionsRenderer();
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 48.8566, lng: 2.3522},
+            zoom: 12
+        });
+        directionsDisplay.setMap(map);
+
+        setMarkers(map);
+
+        if (navigator.geolocation) navigator.geolocation.getCurrentPosition(function (position) {
+            userpos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+
+            var usermarker = new google.maps.Marker({
+                position: userpos,
+                map: map,
+                title: "Your location",
+                label: "U"
+            });
+        });
+    }
+
+    function route(position, mode){
+        console.log(position);
+        console.log(mode);
+        var request = {
+            origin: userpos,
+            destination: position,
+            travelMode: google.maps.TravelMode[mode]
+        };
+        directionsService.route(request, function(response, status) {
+            if (status == 'OK') {
+                directionsDisplay.setDirections(response);
+            }
+        });
+    }
+
+    function handleRouteButton(pos, mode){
+        return function(){return route(pos, mode);}
+    }
+
+    function setMarkers(map) {
+        for (var station of stations) {
+            var fields = station.fields;
+            var pos = {lat: fields.lat, lng: fields.lon};
+            var info = document.createElement("div");
+            var fieldText = ["", "Number of available bikes: ", "Number of available docks: ", "Capacity: ", "Lon / lat: "];
+            var fieldsChosen = [fields.name, fields.numbikesavailable, fields.numdocksavailable, fields.capacity, fields.xy];
+            var travelModes = ["DRIVING", "WALKING","TRANSIT", "BICYCLING"];
+            var travelModeIcons = ["directions_car", "directions_walk", "directions_bus", "directions_bike"];
+
+            // Create field elements
+            for (var i = 0; i < fieldText.length; i++) {
+                var p = document.createElement("p");
+                p.innerHTML = fieldText[i] + fieldsChosen[i];
+                info.appendChild(p);
+            }
+
+            info.appendChild(document.createElement("br"));
+
+            // Create button elements
+            for (var i = 0; i < travelModes.length; i++) {
+
+                var button = document.createElement("button");
+                button.onclick = handleRouteButton(pos, travelModes[i]);
+                button.style.fontSize = "24px";
+
+                var icon = document.createElement("i");
+                icon.className = "material-icons";
+                icon.innerHTML = travelModeIcons[i];
+
+                button.appendChild(icon);
+                info.appendChild(button);
+            }
+
+            var locationInfowindow = new google.maps.InfoWindow({
+                content: info
+            });
+
+            var marker = new google.maps.Marker({
+                position: pos,
+                map: map,
+                title: fields.name,
+                infowindow: locationInfowindow
+            });
+
+            markers.push(marker);
+
+            google.maps.event.addListener(marker, 'click', function () {
+                hideAllInfoWindows(map);
+                this.infowindow.open(map, this);
+            });
+
+        }
+    }
+    function filter() {
+        var numbikes = document.getElementById("numbikes").value;
+        var numdocks= document.getElementById("numdocks").value;
+
+        for (i = 0; i < markers.length; i++) {
+            var fields = stations[i].fields;
+            var marker = markers[i];
+            // If is same category or category not picked
+            if ((fields.numbikesavailable >= numbikes|| numbikes.length === 0) &&
+                (fields.numdocksavailable >= numdocks|| numdocks.length === 0)){
+                marker.setVisible(true);
+            }
+            // Categories don't match
+            else {
+                marker.setVisible(false);
+            }
+        }
+    }
+
+    function hideAllInfoWindows(map) {
+        markers.forEach(function (marker) {
+            marker.infowindow.close(map, marker);
+        });
+    }
+</script>
+
+<!--Load the API from the specified URL
+* The async attribute allows the browser to render the page while the API loads
+* The key parameter will contain your own API key (which is not needed for this tutorial)
+* The callback parameter executes the initMap() function
+-->
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCm6bsVrc9SId-AeBa7CoaOgOVZvJ1HHwI&callback=initMap">
+</script>
+<script src="webjars/jquery/3.3.1-1/jquery.min.js"></script>
+<script src="webjars/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/domain/User.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/services/ApiServiceImpl.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/config/RestTemplateConfig.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/domain/Geometry.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/domain/Role.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/config/SecurityConfiguration.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/repository/RoleRepository.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/domain/StationData.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/controllers/LoginController.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/services/UserService.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/repository/UserRepository.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/domain/Station.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/domain/Fields.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/VelibApplication.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/config/WebMvcConfig.java
+/home/eisti/Downloads/velibWithLogin/src/main/java/dwa/velib/services/ApiService.java
